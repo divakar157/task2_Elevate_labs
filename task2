@@ -1,0 +1,47 @@
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import LabelEncoder
+
+# Load dataset
+df = pd.read_csv("Titanic-Dataset.csv")
+
+# Step 1: Handle missing values
+df["Age"].fillna(df["Age"].mean(), inplace=True)
+df["Fare"].fillna(df["Fare"].mean(), inplace=True)
+df["Embarked"].fillna(df["Embarked"].mode()[0], inplace=True)
+df.drop(columns=["Cabin"], inplace=True)
+
+# Step 2: Encode categorical features
+le = LabelEncoder()
+df["Sex"] = le.fit_transform(df["Sex"])        # male=1, female=0
+df["Embarked"] = le.fit_transform(df["Embarked"])  # S=2, C=0, Q=1
+
+# Step 3: Summary statistics
+print("Summary Statistics:\n")
+print(df.describe())
+
+# Step 4: Histograms
+df.hist(bins=20, figsize=(14, 10), edgecolor='black')
+plt.suptitle("Histograms of Numeric Features", fontsize=16)
+plt.tight_layout()
+plt.show()
+
+# Step 5: Boxplots
+plt.figure(figsize=(12, 6))
+df[["Age", "Fare", "SibSp", "Parch"]].boxplot()
+plt.title("Boxplot of Numerical Features")
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+
+# Step 6: Correlation matrix
+plt.figure(figsize=(10, 8))
+sns.heatmap(df.corr(), annot=True, fmt=".2f", cmap="coolwarm", square=True)
+plt.title("Correlation Matrix")
+plt.show()
+
+# Step 7: Pairplot for feature relationships
+sns.pairplot(df[["Survived", "Pclass", "Sex", "Age", "Fare"]], hue="Survived", diag_kind="kde")
+plt.suptitle("Pairplot of Selected Features", y=1.02)
+plt.show()
